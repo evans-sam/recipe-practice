@@ -1,15 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseSchema } from './types';
 import jsonfile from 'jsonfile';
-import path from 'path';
 
 @Injectable()
 export class DatabaseService {
-  private readonly filePath;
-
-  constructor() {
-    this.filePath = path.join(__dirname, 'data.json');
-  }
+  private readonly filePath = './src/database/data.json';
 
   async openDB(): Promise<DatabaseSchema> {
     return await jsonfile.readFile(this.filePath);

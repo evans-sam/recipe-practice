@@ -3,7 +3,7 @@
     "./node_modules"
   ],
   "compilerOptions": {
-    "module": "es2020",
+    "module": "commonjs",
     "composite": true,
     "declaration": true,
     "removeComments": true,
