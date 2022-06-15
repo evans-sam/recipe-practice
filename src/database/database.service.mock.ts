@@ -21,4 +21,5 @@ export const MockDatabase: DatabaseSchema = {
 
 export const MockDatabaseService = {
   openDB: jest.fn(),
+  saveDB: jest.fn(),
 };
