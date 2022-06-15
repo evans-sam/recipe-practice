@@ -7,7 +7,7 @@ import { EntityService } from '../entity/entity.service';
 export class RecipeService {
   constructor(private readonly entityService: EntityService) {}
 
-  create(createRecipeDto: CreateRecipeDto) {
+  async create(createRecipeDto: CreateRecipeDto) {
     return 'This action adds a new recipe';
   }
 
@@ -15,15 +15,15 @@ export class RecipeService {
     return this.entityService.findAll('recipes');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recipe`;
+  async findOne(name: string) {
+    return `This action returns a #${name} recipe`;
   }
 
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    return `This action updates a #${id} recipe`;
+  async update(name: string, updateRecipeDto: UpdateRecipeDto) {
+    return `This action updates a #${name} recipe`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recipe`;
+  async remove(name: string) {
+    return `This action removes a #${name} recipe`;
   }
 }

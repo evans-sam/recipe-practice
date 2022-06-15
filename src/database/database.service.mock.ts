@@ -15,6 +15,13 @@ export const IceCream = {
   ingredients: ['milk', 'sugar', 'whatever you want'],
   instructions: ['combine all', 'put in ice cream maker'],
 };
+
+export const RootBeerFloat = {
+  name: 'rootBeerFloat',
+  ingredients: ['ice cream', 'root beer'],
+  instructions: ['put them in a cup'],
+};
+
 export const MockDatabase: DatabaseSchema = {
   recipes: [BeefWellington, Sourdough, IceCream],
 };

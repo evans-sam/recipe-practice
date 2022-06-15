@@ -1,6 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseSchema, Entity, Table } from '../database/types';
 import { DatabaseService } from '../database/database.service';
+import { remove } from 'lodash';
+
+export interface UpdateParams {
+  tableName: keyof DatabaseSchema;
+  newRow: Partial<Entity> & Required<Pick<Entity, 'name'>>;
+}
+
+export interface CreateParams {
+  tableName: keyof DatabaseSchema;
+  row: Entity;
+}
+
+export interface FindParams {
+  tableName: keyof DatabaseSchema;
+  name: string;
+}
 
 @Injectable()
 export class EntityService {
@@ -10,37 +26,32 @@ export class EntityService {
     return await this.getTable(tableName);
   }
 
-  async findByName(
-    tableName: keyof DatabaseSchema,
-    name: string,
-  ): Promise<Entity> {
+  async findByName({ tableName, name }: FindParams): Promise<Entity> {
     const table = await this.getTable(tableName);
     return table.find((row: Record<string, any>) => row.name === name);
   }
 
-  async create(tableName: keyof DatabaseSchema, row: Entity): Promise<void> {
+  async create({ tableName, row }: CreateParams): Promise<void> {
     const table = await this.getTable(tableName);
     table.push(row);
     await this.updateTable(tableName, table);
   }
 
-  async update(
-    tableName: keyof DatabaseSchema,
-    newRow: Partial<Entity>,
-  ): Promise<void> {
+  async update({ tableName, newRow }: UpdateParams): Promise<void> {
     const table = await this.getTable(tableName);
-    const oldRow = await this.findByName(tableName, newRow.name);
+    const oldRow = await this.findByName({
+      tableName: tableName,
+      name: newRow.name,
+    });
     Object.assign(oldRow, newRow);
     await this.updateTable(tableName, table);
   }
 
-  async remove(tableName: keyof DatabaseSchema, name: string): Promise<void> {
+  async remove({ tableName, name }: FindParams): Promise<void> {
     const table = await this.getTable(tableName);
+    remove(table, (row) => row.name === name);
 
-    await this.updateTable(
-      tableName,
-      table.filter((row) => row.name !== name),
-    );
+    await this.updateTable(tableName, table);
   }
 
   private async getTable(tableName: keyof DatabaseSchema): Promise<Table> {
@@ -52,8 +63,8 @@ export class EntityService {
     tableName: keyof DatabaseSchema,
     table: Table,
   ): Promise<void> {
-    const db = await this.databaseService.openDB();
-    db[tableName] = table;
-    await this.databaseService.saveDB(db);
+    const database = await this.databaseService.openDB();
+    database[tableName] = table;
+    await this.databaseService.saveDB(database);
   }
 }

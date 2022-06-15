@@ -6,12 +6,13 @@ import {
   IceCream,
   MockDatabase,
   MockDatabaseService,
+  RootBeerFloat,
 } from '../database/database.service.mock';
 import { Recipe } from '../recipe/entities/recipe.entity';
 import { DatabaseSchema } from '../database/types';
 
 describe('EntityService', () => {
-  let service: EntityService;
+  let entityService: EntityService;
   let mockDB: DatabaseSchema;
 
   beforeAll(async () => {
@@ -22,7 +23,7 @@ describe('EntityService', () => {
       .useValue(MockDatabaseService)
       .compile();
 
-    service = module.get<EntityService>(EntityService);
+    entityService = module.get<EntityService>(EntityService);
   });
 
   beforeEach(() => {
@@ -35,35 +36,36 @@ describe('EntityService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(entityService).toBeDefined();
   });
 
   it('should return a named table', async () => {
-    expect(await service.findAll('recipes')).toStrictEqual(
+    expect(await entityService.findAll('recipes')).toStrictEqual(
       MockDatabase.recipes,
     );
   });
 
   it('should find a row by name', async () => {
     expect(
-      await service.findByName('recipes', BeefWellington.name),
+      await entityService.findByName({
+        tableName: 'recipes',
+        name: BeefWellington.name,
+      }),
     ).toStrictEqual(BeefWellington);
 
-    expect(await service.findByName('recipes', IceCream.name)).toStrictEqual(
-      IceCream,
-    );
+    expect(
+      await entityService.findByName({
+        tableName: 'recipes',
+        name: IceCream.name,
+      }),
+    ).toStrictEqual(IceCream);
   });
 
   it('should create a row', async () => {
-    const float: Recipe = {
-      name: 'rootBeerFloat',
-      ingredients: ['ice cream', 'root beer'],
-      instructions: ['put them in a cup'],
-    };
+    await entityService.create({ tableName: 'recipes', row: RootBeerFloat });
 
-    await service.create('recipes', float);
-
-    expect(mockDB.recipes).toContainEqual(float);
+    expect(mockDB.recipes).toContainEqual(RootBeerFloat);
+    expect(MockDatabaseService.saveDB).toHaveBeenCalled();
   });
 
   it('should update a row', async () => {
@@ -74,15 +76,20 @@ describe('EntityService', () => {
       instructions: [...BeefWellington.instructions, 'add some sauce'],
     };
 
-    await service.update('recipes', newWellington);
+    await entityService.update({ tableName: 'recipes', newRow: newWellington });
 
+    expect(MockDatabaseService.saveDB).toHaveBeenCalled();
     expect(mockDB.recipes).toContainEqual(newWellington);
     expect(mockDB.recipes).not.toContainEqual(oldWellington);
   });
 
   it('removes table rows', async () => {
-    await service.remove('recipes', BeefWellington.name);
+    await entityService.remove({
+      tableName: 'recipes',
+      name: BeefWellington.name,
+    });
 
+    expect(MockDatabaseService.saveDB).toHaveBeenCalled();
     expect(mockDB.recipes).not.toContainEqual(BeefWellington);
   });
 });
