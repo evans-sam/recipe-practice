@@ -10,6 +10,7 @@ import {
 } from '../database/database.service.mock';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { HttpException } from '@nestjs/common';
 
 describe('RecipeController', () => {
   let controller: RecipeController;
@@ -62,9 +63,9 @@ describe('RecipeController', () => {
   it('does not add a recipe if it already exists', async () => {
     MockRecipeService.findOne.mockImplementation(() => IceCream);
 
-    await expect(
-      async () => await controller.create(IceCream),
-    ).rejects.toThrowError('Recipe already exists');
+    await expect(async () => await controller.create(IceCream)).rejects.toThrow(
+      new HttpException({ error: 'Recipe already exists' }, 404),
+    );
     expect(MockRecipeService.create).not.toHaveBeenCalled();
   });
 
@@ -86,7 +87,9 @@ describe('RecipeController', () => {
         await controller.update('pizza', {
           ingredients: ['dough', 'cheese', 'sauce'],
         }),
-    ).rejects.toThrowError('Recipe does not exist');
+    ).rejects.toThrowError(
+      new HttpException({ error: 'Recipe does not exist' }, 404),
+    );
     expect(MockRecipeService.update).not.toHaveBeenCalled();
   });
 

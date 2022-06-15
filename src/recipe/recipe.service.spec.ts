@@ -1,11 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecipeService } from './recipe.service';
-import {
-  CreateParams,
-  EntityService,
-  FindParams,
-  UpdateParams,
-} from '../entity/entity.service';
 import { MockEntityService } from '../entity/entity.service.mock';
 import {
   BeefWellington,
@@ -14,6 +8,8 @@ import {
   RootBeerFloat,
 } from '../database/database.service.mock';
 import { remove } from 'lodash';
+import { EntityService } from '../entity/entity.service';
+import { CreateParams, FindParams, UpdateParams } from '../entity/types';
 
 describe('RecipeService', () => {
   let recipeService: RecipeService;

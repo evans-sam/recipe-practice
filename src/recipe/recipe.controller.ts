@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   Param,
   Patch,
   Post,
+  Put,
 } from '@nestjs/common';
 import { RecipeService } from './recipe.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
@@ -19,7 +21,8 @@ export class RecipeController {
   @Post()
   async create(@Body() createRecipeDto: CreateRecipeDto) {
     const recipe = await this.recipeService.findOne(createRecipeDto.name);
-    if (recipe) throw new HttpException('Recipe already exists', 400);
+    if (recipe)
+      throw new HttpException({ error: 'Recipe already exists' }, 400);
 
     return this.recipeService.create(createRecipeDto);
   }
@@ -45,15 +48,32 @@ export class RecipeController {
       : {};
   }
 
+  @Get('/details/:name')
+  async findDetails(@Param('name') name: string) {
+    return this.findOne(name);
+  }
+
   @Patch(':name')
   async update(
     @Param('name') name: string,
     @Body() updateRecipeDto: UpdateRecipeDto,
   ) {
     const recipe = await this.recipeService.findOne(name);
-    if (!recipe) throw new HttpException('Recipe does not exist', 404);
+    if (!recipe)
+      throw new HttpException({ error: 'Recipe does not exist' }, 404);
 
-    return this.recipeService.update(name, updateRecipeDto);
+    await this.recipeService.update(name, updateRecipeDto);
+
+    return;
+  }
+
+  @Put()
+  @HttpCode(204)
+  async put(@Body() updatedRecipeDto: UpdateRecipeDto) {
+    if (!updatedRecipeDto.name)
+      throw new HttpException({ error: 'Recipe does not exist' }, 404);
+
+    return await this.update(updatedRecipeDto.name, updatedRecipeDto);
   }
 
   @Delete(':name')

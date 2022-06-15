@@ -2,21 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseSchema, Entity, Table } from '../database/types';
 import { DatabaseService } from '../database/database.service';
 import { remove } from 'lodash';
-
-export interface UpdateParams {
-  tableName: keyof DatabaseSchema;
-  newRow: Partial<Entity> & Required<Pick<Entity, 'name'>>;
-}
-
-export interface CreateParams {
-  tableName: keyof DatabaseSchema;
-  row: Entity;
-}
-
-export interface FindParams {
-  tableName: keyof DatabaseSchema;
-  name: string;
-}
+import { CreateParams, FindParams, UpdateParams } from './types';
 
 @Injectable()
 export class EntityService {
