@@ -29,6 +29,10 @@ describe('RecipeService', () => {
     recipeService = module.get<RecipeService>(RecipeService);
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(recipeService).toBeDefined();
   });
@@ -92,7 +96,7 @@ describe('RecipeService', () => {
       },
     });
 
-    expect(oldWellington).toBe({
+    expect(oldWellington).toStrictEqual({
       ...BeefWellington,
       instructions: newWellington.instructions,
     });

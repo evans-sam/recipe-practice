@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -16,7 +17,10 @@ export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
 
   @Post()
-  create(@Body() createRecipeDto: CreateRecipeDto) {
+  async create(@Body() createRecipeDto: CreateRecipeDto) {
+    const recipe = await this.recipeService.findOne(createRecipeDto.name);
+    if (recipe) throw new HttpException('Recipe already exists', 400);
+
     return this.recipeService.create(createRecipeDto);
   }
 
@@ -28,18 +32,32 @@ export class RecipeController {
     };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recipeService.findOne(+id);
+  @Get(':name')
+  async findOne(@Param('name') name: string) {
+    const recipe = await this.recipeService.findOne(name);
+    return recipe
+      ? {
+          details: {
+            ingredients: recipe.ingredients,
+            numSteps: recipe.instructions.length,
+          },
+        }
+      : {};
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecipeDto: UpdateRecipeDto) {
-    return this.recipeService.update(+id, updateRecipeDto);
+  @Patch(':name')
+  async update(
+    @Param('name') name: string,
+    @Body() updateRecipeDto: UpdateRecipeDto,
+  ) {
+    const recipe = await this.recipeService.findOne(name);
+    if (!recipe) throw new HttpException('Recipe does not exist', 404);
+
+    return this.recipeService.update(name, updateRecipeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recipeService.remove(+id);
+  @Delete(':name')
+  remove(@Param('name') name: string) {
+    return this.recipeService.remove(name);
   }
 }
