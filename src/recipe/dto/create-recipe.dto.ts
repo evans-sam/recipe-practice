@@ -3,6 +3,7 @@ import { BaseRecipe } from '../../database/types';
 
 export class CreateRecipeDto implements BaseRecipe {
   @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsArray()

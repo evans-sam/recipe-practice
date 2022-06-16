@@ -100,6 +100,18 @@ describe('Recipes', () => {
       .expect({ error: 'Recipe already exists' });
   });
 
+  //TODO doesn't work
+  // it('/POST cannot add a recipe without a name', () => {
+  //   const noName = omit(RootBeerFloat, 'name');
+  //   return request(app.getHttpServer())
+  //     .post('/recipes')
+  //     .send(noName)
+  //     .expect(400)
+  //     .expect({
+  //       error: 'Bad Request',
+  //     });
+  // });
+
   afterAll(async () => {
     await app.close();
   });
